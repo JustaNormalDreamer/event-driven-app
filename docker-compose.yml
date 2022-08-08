@@ -1,0 +1,60 @@
+version: "3.3"
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+    restart: always
+    networks:
+      - ems
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_VHOST: /
+
+  product_backend:
+    container_name: product_backend
+    hostname: product_backend
+    build: ./products
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - ems
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ems_data:/var/www/html
+    links:
+      - rabbitmq
+    environment:
+      APP_PORT: 8080
+
+  fe:
+    container_name: fe
+    hostname: fe
+    build: ./fe
+    ports:
+      - "8081:80"
+    depends_on:
+      - product_backend
+    links:
+      - product_backend
+    environment:
+      REACT_APP_NAME: Karyakram
+      REACT_APP_BACKEND_URL: http://localhost:8080/graphql
+      REACT_APP_BACKEND_WS_URL: ws://localhost:8080/subscriptions
+      REACT_APP_JAVA_BACKEND_URL: http://localhost:8082
+      REACT_APP_SUPER_ROLE: Admin
+      REACT_APP_MINIO_URL: http://localhost:9000/event-management-system
+
+networks:
+  ems:
+    driver: bridge
+volumes:
+  ems_data: {}
+
+
+
