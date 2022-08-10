@@ -2,25 +2,38 @@ import express, { Request, Response, Express } from 'express';
 import dotenv from 'dotenv';
 import {appConfig} from './config';
 import { RabbitMQ } from './rabbitmq';
-// import { io } from './socket';
 import { Server } from 'socket.io';
+import cors from 'cors';
 
 dotenv.config();
 
 const app: Express = express();
 
+app.use(cors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+}));
+
 app.use(express.json());
 
 RabbitMQ.connect();
 
-const io = new Server(appConfig.socketPort);
+export const io = new Server(appConfig.socketPort, { cors: {
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+} });
 
 io.on("connect", (socket) => {
     console.log("Connection to the socket has been established.");
-});
+    socket.on("message", (arg) => {
+        console.log("Message received.");
+    });
 
-io.on("message", (socket) => {
-    console.log("Message received from the socket.");
+    socket.on("disconnect", (arg) => {
+        console.log("Disconnected from the socket.");
+    })
 });
 
 app.get('/', (req: Request, res: Response) => {
