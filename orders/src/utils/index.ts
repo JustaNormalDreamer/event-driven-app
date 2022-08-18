@@ -1,5 +1,5 @@
 export const generateRandomNumber = (): number => {
-    return Math.floor(Math.random() * 100);
+    return Math.floor(Math.random() * 10);
 }
 
 const words: string[] = [

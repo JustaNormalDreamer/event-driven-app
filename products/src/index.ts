@@ -36,14 +36,14 @@ io.on("connect", (socket) => {
     })
 });
 
-app.get('/', (req: Request, res: Response) => {
- res.send('Echo World!!');
-});
+// app.get('/', (req: Request, res: Response) => {
+//  res.send('Echo World!!');
+// });
 
-app.get('/mq', (req: Request, res: Response) => {
-    RabbitMQ.getChannel().sendToQueue('order', Buffer.from('Hello World!'));
-    res.send("Message sent to RabbitMQ server.");
-});
+// app.get('/mq', (req: Request, res: Response) => {
+//     RabbitMQ.getChannel().sendToQueue('order', Buffer.from('Hello World!'));
+//     res.send("Message sent to RabbitMQ server.");
+// });
 
 app.listen(appConfig.appPort, () => {
     console.log(`Server started on port ${appConfig.appPort}`);

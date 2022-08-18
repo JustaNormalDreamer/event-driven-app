@@ -17,13 +17,17 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.get('/mq', (req: Request, res: Response) => {
-    const message = {
-        priority: generateRandomNumber(),
-        message: generateRandomPhrase(),
-        timestamp: new Date().toISOString(),
-    };
+    setTimeout(() => {
+        for(let i=0; i<20; i++) {
+            const message = {
+                priority: generateRandomNumber(),
+                message: generateRandomPhrase(),
+                timestamp: new Date().toISOString(),
+            };
 
-    RabbitMQ.getChannel().sendToQueue('product', Buffer.from(JSON.stringify(message)));
+            RabbitMQ.getChannel().sendToQueue('product', Buffer.from(JSON.stringify(message)));
+        }
+    }, 1000);
     res.send("Message sent to RabbitMQ server.");
 });
 
